@@ -1,0 +1,54 @@
+- name: Install kubernetes packages
+  hosts: kubernetes
+
+  tasks:
+  - name: One way to avoid apt_key once it is removed from your distro
+    block:
+      - name: kubernetes | no apt key
+        ansible.builtin.get_url:
+          url: https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key
+          dest: /etc/apt/keyrings/kubernetes.key
+        become: true
+      - name: kubernetes | apt source
+        ansible.builtin.apt_repository:
+          repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/kubernetes.key] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /"
+          state: present
+  - name: Install kubernetes packages
+    ansible.builtin.apt:
+      name:
+      - kubelet=1.28.3-1.1
+      - kubeadm=1.28.3-1.1
+      - kubectl=1.28.3-1.1
+    become: true
+  - name: Hold kubelet binaries
+    ansible.builtin.dpkg_selections:
+      name: kubelet
+      selection: "hold"
+    become: true
+  - name: hold kubeadm binaries
+    ansible.builtin.dpkg_selections:
+      name: kubeadm
+      selection: "hold"
+    become: true
+  - name: Hold kubectl binaries
+    ansible.builtin.dpkg_selections:
+      name: kubectl
+      selection: "hold"
+    become: true
+  - name: One way to avoid apt_key once it is removed from your distro
+    block:
+      - name: helm | no apt key
+        ansible.builtin.get_url:
+          url: https://baltocdn.com/helm/signing.asc
+          dest: /etc/apt/keyrings/helm.asc
+        become: true
+      - name: kubernetes | apt source
+        ansible.builtin.apt_repository:
+          repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/helm.asc] https://baltocdn.com/helm/stable/debian/ all main"
+          state: present
+        become: true
+  - name: Install helm
+    ansible.builtin.apt:
+      name:
+      - helm
+    become: true

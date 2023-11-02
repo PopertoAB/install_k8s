@@ -1,0 +1,20 @@
+- name: Install tools on automation server
+  hosts: localhost
+  connection: local
+  vars:
+    user: "scuevas"
+
+  tasks:
+  - name: Update and upgrade the SO
+    apt:
+      update_cache: yes
+      upgrade: "yes"
+    become: true
+  - name: Install utilities
+    apt:
+      name:
+      - tasksel
+      - vim
+      - ansible
+      update_cache: yes
+    become: true

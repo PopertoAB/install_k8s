@@ -1,0 +1,15 @@
+controlplane:
+  hosts:
+    control-plane:
+    control-plane-secondary:
+    control-plane-tertiary:
+
+workers:
+  hosts:
+    worker1:
+    worker2:
+
+kubernetes:
+  children:
+    controlplane:
+    workers:
